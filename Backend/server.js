@@ -10,12 +10,11 @@ app.use(express.json());
 app.use("/api/auth", require("./routes/authroutes"));
 
 
-// Test route
 app.get("/", (req, res) => {
   res.send("HiRize API running");
 });
 
-// Connect DB
+
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {
