@@ -24,10 +24,10 @@ app.use("/api/notes", noteRoutes);
 
 // Test route
 app.get("/", (req, res) => {
-  res.send("HiRize API running");
+  res.send("HIRIZE API running");
 });
 
-// DB + Server
+
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {

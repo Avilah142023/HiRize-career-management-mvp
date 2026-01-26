@@ -54,7 +54,7 @@ const CareerProfile = () => {
 
         {/* Form */}
         <div className="space-y-6 px-8 pb-8">
-          {/* Current/Target Role */}
+          {/* Role */}
           <div>
             <label className="block text-lg font-semibold text-gray-900 mb-3">
               Current / Target Role

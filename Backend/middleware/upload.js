@@ -4,7 +4,7 @@ import fs from "fs";
 
 const uploadDir = "uploads";
 
-// Create uploads folder if not exists
+//uploads folder
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }

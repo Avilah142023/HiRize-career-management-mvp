@@ -25,7 +25,7 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-// Get all notes for logged-in user
+// Gets all notes for logged-in user
 router.get("/", auth, async (req, res) => {
   try {
     const notes = await Note.find({ userId: req.user.id })

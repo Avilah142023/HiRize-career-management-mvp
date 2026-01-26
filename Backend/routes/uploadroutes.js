@@ -28,19 +28,6 @@ router.post("/resume", auth, upload.single("resume"), async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-// Delete file
-router.delete("/:id", auth, async (req, res) => {
-  try {
-    await File.findOneAndDelete({
-      _id: req.params.id,
-      userId: req.user.id,
-    });
-    res.json({ message: "File deleted" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
 
 // Cover letter upload
 router.post(

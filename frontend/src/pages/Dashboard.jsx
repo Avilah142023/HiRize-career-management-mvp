@@ -335,7 +335,7 @@ const ResumePage = () => {
   const [resumes, setResumes] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  // ✅ Fetch resumes on page load
+  // Fetch resumes on page load
   useEffect(() => {
     fetchResumes();
   }, []);
@@ -362,7 +362,7 @@ const ResumePage = () => {
     }
   };
 
-  // ✅ Upload resume
+  // Upload resume
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -400,7 +400,7 @@ const ResumePage = () => {
     }
   };
 
-  // ✅ Delete resume
+  // Delete resume
   const deleteResume = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -423,7 +423,7 @@ const ResumePage = () => {
       <div className="bg-white rounded-xl shadow-sm p-8">
         <h3 className="text-4xl font-bold mb-4">Resume</h3>
 
-        {/* ✅ Uploaded resumes */}
+        {/* Uploaded resumes */}
         {resumes.length === 0 && (
           <p className="text-gray-500 text-xl font-medium mb-4">No resumes uploaded yet</p>
         )}
@@ -433,7 +433,7 @@ const ResumePage = () => {
             key={resume._id}
             className="flex justify-between items-center p-4 mb-3 border rounded-lg bg-green-50"
           >
-            {/* ✅ CLICK TO PREVIEW */}
+            {/* file preview */}
             <a
               href={`http://localhost:5000/${resume.filePath}`}
               target="_blank"
@@ -452,7 +452,7 @@ const ResumePage = () => {
           </div>
         ))}
 
-        {/* ✅ Upload */}
+        {/* Upload */}
         <div className="border-2 border-dashed rounded-lg p-12 text-center mt-6">
           <label className="px-6 py-3 bg-sky-700 text-white rounded-lg cursor-pointer">
             {uploading ? "Uploading..." : "Upload Resume"}
@@ -489,7 +489,7 @@ const CoverLetterPage = () => {
 
       const data = await res.json();
 
-      // Get latest cover letter only
+      // fetch cover letter
       const coverLetter = data.files.find(
         (file) => file.fileType === "coverletter"
       );
@@ -506,7 +506,7 @@ const CoverLetterPage = () => {
 }, []);
 
 
-  // ✅ UPLOAD
+  // Upload
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -546,7 +546,7 @@ const CoverLetterPage = () => {
     }
   };
 
-  // ✅ DELETE
+  // Delete
   const handleDelete = async () => {
     if (!uploadedFile) return;
 
@@ -587,7 +587,7 @@ const CoverLetterPage = () => {
           Upload and manage your cover letters
         </p>
 
-        {/* ✅ Uploaded File Display */}
+        {/* Uploaded File Display */}
         {uploadedFile && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex justify-between items-center">
            <a
@@ -607,7 +607,7 @@ const CoverLetterPage = () => {
           </div>
         )}
 
-        {/* ✅ Upload Section */}
+        {/* Upload Section */}
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
           <div className="text-6xl mb-4">✉️</div>
           <p className="text-gray-600 font-semibold mb-4">
@@ -635,7 +635,7 @@ const DocumentsPage = () => {
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  // ✅ Fetch documents on page load
+  // Fetch documents on page load
   useEffect(() => {
     fetchDocuments();
   }, []);
@@ -662,7 +662,7 @@ const DocumentsPage = () => {
     }
   };
 
-  // ✅ Upload document
+  // Upload document
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -700,7 +700,7 @@ const DocumentsPage = () => {
     }
   };
 
-  // ✅ Delete document
+  // Delete document
   const deleteDocument = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -729,7 +729,7 @@ const DocumentsPage = () => {
           Upload and manage all your job-related documents
         </p>
 
-        {/* ✅ Uploaded documents */}
+        {/* Uploaded documents */}
         {documents.length === 0 && (
           <p className="text-gray-500 font-semibold text-lg mb-4">No documents uploaded yet</p>
         )}
@@ -739,7 +739,7 @@ const DocumentsPage = () => {
             key={doc._id}
             className="flex justify-between items-center p-4 mb-3 border rounded-lg bg-green-50"
           >
-            {/* ✅ Preview / Open */}
+            {/* Preview */}
             <a
               href={`http://localhost:5000/${doc.filePath}`}
               target="_blank"
@@ -758,7 +758,7 @@ const DocumentsPage = () => {
           </div>
         ))}
 
-        {/* ✅ Upload */}
+        {/* Upload */}
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center mt-6">
           <div className="text-6xl mb-4">📁</div>
 
