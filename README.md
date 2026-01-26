@@ -1,4 +1,4 @@
-# HIRIZE – Career Management Platform (POC)
+# HIRIZE – Career Management Platform
 
 HIRIZE is a full-stack web application designed to help job seekers manage multiple resumes, cover letters, and supporting documents in one place.  
 The project is built as a Proof of Concept (POC) with a strong focus on usability, modular design, and extensibility for future career-tracking features.
