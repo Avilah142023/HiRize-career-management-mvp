@@ -34,9 +34,9 @@ export const signup = async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.name,        // From signup form
-        email: user.email,      // From signup form
-        // title will be empty initially, set later in CareerProfile
+        name: user.name,        
+        email: user.email,     
+        
       },
     });
   } catch (error) {
@@ -75,7 +75,7 @@ export const signin = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        title: user.title,      // This will have value if user completed CareerProfile
+        title: user.title,      
       },
     });
   } catch (error) {

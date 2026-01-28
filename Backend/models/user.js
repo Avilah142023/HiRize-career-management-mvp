@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // New fields for profile
+    
     title: {
       type: String,
       default: '',

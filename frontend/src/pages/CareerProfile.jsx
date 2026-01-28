@@ -6,8 +6,8 @@ const CareerProfile = () => {
     industry: '',
     experienceLevel: ''
   });
-  const [loading, setLoading] = useState(false);  // ADD THIS
-  const [error, setError] = useState(''); // ADD THIS
+  const [loading, setLoading] = useState(false);  
+  const [error, setError] = useState(''); 
 
   const industries = [
     'Technology',
@@ -62,7 +62,7 @@ const CareerProfile = () => {
 
     if (response.ok) {
       console.log('Career profile updated:', data);
-      // The role is now saved as title in the database
+      
       window.location.href = '/JobPreferences';
     } else {
       setError(data.message || 'Failed to update profile');
@@ -88,7 +88,7 @@ const CareerProfile = () => {
           </p>
         </div>
 
-        {/* ADD THIS ERROR MESSAGE */}
+        
         {error && (
          <div className="mx-8 mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
         {error}
@@ -294,10 +294,10 @@ const CareerProfile = () => {
           {/* Next Button */}
           <button
             onClick={handleSubmit}
-             disabled={loading}  // ADD THIS
+             disabled={loading} 
             className="w-full py-4 bg-sky-900 text-white text-lg font-semibold rounded-2xl hover:bg-sky-950 transition-colors mt-8 disabled:bg-sky-300 disabled:cursor-not-allowed"  // ADD disabled styles
              >
-            {loading ? 'SAVING...' : 'Next'}  {/* CHANGE THIS */}
+            {loading ? 'SAVING...' : 'Next'}  
             </button>
         </div>
       </div>

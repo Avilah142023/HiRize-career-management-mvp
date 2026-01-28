@@ -18,7 +18,7 @@ export const verifyToken = (req, res, next) => {
   }
 };
 
-// Update career profile (role, industry, experienceLevel)
+// Update career profile
 export const updateCareerProfile = async (req, res) => {
   try {
     const { role, industry, experienceLevel } = req.body;
@@ -98,7 +98,7 @@ export const updateUserProfile = async (req, res) => {
     const userId = req.userId;
     const updateData = req.body;
 
-    // Remove password from update data if present
+   
     delete updateData.password;
 
     const user = await User.findByIdAndUpdate(

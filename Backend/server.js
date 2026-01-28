@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authroutes.js";
 import uploadRoutes from "./routes/uploadroutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
-import profileRoutes from "./routes/profileRoutes.js"; // Add this
+import profileRoutes from "./routes/profileRoutes.js"; 
 
 dotenv.config();
 

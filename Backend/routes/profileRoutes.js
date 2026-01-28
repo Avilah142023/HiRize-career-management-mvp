@@ -8,7 +8,7 @@ import {
 
 const router = express.Router();
 
-// All routes require authentication
+// Career profile routes
 router.post("/career", verifyToken, updateCareerProfile);
 router.get("/", verifyToken, getUserProfile);
 router.put("/", verifyToken, updateUserProfile);
