@@ -6,18 +6,72 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [profileData, setProfileData] = useState({
-    name: 'Avilah',
-    email: 'Avilah@123.com',
-    phone: '+91 9876543210',
-    location: 'Chennai, Tamil Nadu',
-    title: 'Software Engineer',
-    bio: 'Passionate developer with 3 years of experience in full-stack development.',
-    skills: ['React', 'Node.js', 'Python', 'MongoDB', 'AWS', 'Docker'],
-    experience: '3 years',
-    education: 'Bachelor of Computer Science and Engineering',
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    title: '',
+    bio: '',
+    skills: [],
+    experience: '',
+    education: '',
     profileImage: null
   });
-  const [isEditing, setIsEditing] = useState(false);
+
+   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Fetch user profile on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        window.location.href = '/';
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setProfileData({
+          name: data.user.name || '',
+          email: data.user.email || '',
+          phone: data.user.phone || '',
+          location: data.user.location || '',
+          title: data.user.title || '',
+          bio: data.user.bio || '',
+          skills: data.user.skills || [],
+          experience: data.user.experience || '',
+          education: data.user.education || '',
+          profileImage: data.user.profileImage || null
+        });
+      } else {
+        setError('Failed to load profile');
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          window.location.href = '/';
+        }
+      }
+    } catch (err) {
+      setError('Network error');
+      console.error('Fetch profile error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const menuItems = [
     { id: 'profile', name: 'Profile', icon: '👤' },
@@ -48,6 +102,14 @@ const Dashboard = () => {
         return <ProfilePage profileData={profileData} setProfileData={setProfileData} isEditing={isEditing} setIsEditing={setIsEditing} />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-gray-600">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -142,9 +204,33 @@ const Dashboard = () => {
   );
 };
 
-// Profile Page Component
 const ProfilePage = ({ profileData, setProfileData, isEditing, setIsEditing }) => {
   const [editData, setEditData] = useState(profileData);
+  const [saving, setSaving] = useState(false);
+  const [newSkill, setNewSkill] = useState('');
+  const [showSkillInput, setShowSkillInput] = useState(false);
+
+  useEffect(() => {
+    setEditData(profileData);
+  }, [profileData]);
+
+  const handleAddSkill = () => {
+    if (newSkill.trim() !== '') {
+      setEditData({
+        ...editData,
+        skills: [...editData.skills, newSkill.trim()]
+      });
+      setNewSkill('');
+      setShowSkillInput(false);
+    }
+  };
+
+  const handleRemoveSkill = (indexToRemove) => {
+    setEditData({
+      ...editData,
+      skills: editData.skills.filter((_, index) => index !== indexToRemove)
+    });
+  };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -160,176 +246,259 @@ const ProfilePage = ({ profileData, setProfileData, isEditing, setIsEditing }) =
     }
   };
 
-  const handleSave = () => {
-    setProfileData(editData);
-    console.log('Saving profile:', editData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch('http://localhost:5000/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setProfileData(editData);
+        setIsEditing(false);
+        console.log('Profile saved successfully');
+      } else {
+        console.error('Failed to save profile:', data.message);
+        alert('Failed to save profile');
+      }
+    } catch (err) {
+      console.error('Save profile error:', err);
+      alert('Network error. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="w-full">
-      <div className="bg-white rounded-xl shadow-sm p-8">
-        {/* Profile Header */}
-        <div className="flex items-start justify-between mb-8">
-          <div className="flex items-center gap-6">
-            <div className="relative group">
-              <div className="w-24 h-24 bg-gradient-to-br from-sky-700 to-sky-500 rounded-full flex items-center justify-center text-white text-4xl font-bold overflow-hidden">
-                {profileData.profileImage ? (
-                  <img src={profileData.profileImage} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  profileData.name.charAt(0)
-                )}
-              </div>
-              <label className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
-                <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                  <circle cx="12" cy="13" r="4"></circle>
-                </svg>
+    <div className="bg-white rounded-2xl shadow-lg p-8">
+      {/* Profile Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center space-x-6">
+          <div className="relative">
+            <div className="w-24 h-24 bg-gradient-to-br from-sky-700 to-sky-500 rounded-full flex items-center justify-center text-white text-4xl font-bold overflow-hidden">
+              {profileData.profileImage ? (
+                <img src={profileData.profileImage} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                profileData.name.charAt(0)
+              )}
+            </div>
+            {isEditing && (
+              <label className="absolute bottom-0 right-0 bg-sky-700 text-white rounded-full p-2 cursor-pointer hover:bg-sky-800">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
                   className="hidden"
                 />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
               </label>
-            </div>
-            <div>
-              <h2 className="text-4xl font-bold text-gray-900">{profileData.name}</h2>
-              <p className="text-xl text-gray-600 mt-1">{profileData.title}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="px-6 py-2 bg-sky-700 text-white rounded-lg hover:bg-sky-800 transition-colors font-medium"
-          >
-            {isEditing ? 'Cancel' : 'Edit Profile'}
-          </button>
-        </div>
-
-        {/* Profile Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div>
-            <label className="block text-xl font-semibold text-gray-700 mb-2">Email</label>
-            {isEditing ? (
-              <input
-                type="email"
-                value={editData.email}
-                onChange={(e) => setEditData({...editData, email: e.target.value})}
-                className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            ) : (
-              <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.email}</p>
             )}
           </div>
-
           <div>
-            <label className="block text-xl font-semibold text-gray-700 mb-2">Phone Number</label>
-            {isEditing ? (
-              <input
-                type="tel"
-                value={editData.phone}
-                onChange={(e) => setEditData({...editData, phone: e.target.value})}
-                className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            ) : (
-              <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.phone}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-xl font-semibold text-gray-700 mb-2">Location</label>
-            {isEditing ? (
-              <input
-                type="text"
-                value={editData.location}
-                onChange={(e) => setEditData({...editData, location: e.target.value})}
-                className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            ) : (
-              <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.location}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-xl font-semibold text-gray-700 mb-2">Experience</label>
-            {isEditing ? (
-              <input
-                type="text"
-                value={editData.experience}
-                onChange={(e) => setEditData({...editData, experience: e.target.value})}
-                className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            ) : (
-              <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.experience}</p>
-            )}
+            <h2 className="text-4xl font-bold text-gray-900">{profileData.name}</h2>
+            <p className="text-xl text-gray-600 mt-1">{profileData.title}</p>
           </div>
         </div>
+        <div className="flex gap-3">
+          {!isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-6 py-2 bg-sky-700 text-white rounded-lg hover:bg-sky-800 transition-colors"
+            >
+              Edit Profile
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="px-6 py-2 bg-sky-700 text-white rounded-lg hover:bg-sky-800 transition-colors disabled:bg-sky-300"
+              >
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditData(profileData);
+                }}
+                className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </>
+          )}
+        </div>
+      </div>
 
-        {/* Bio */}
-        <div className="mb-8">
-          <label className="block text-xl font-semibold text-gray-700 mb-2">Bio</label>
+      {/* Profile Information */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <label className="block text-xl font-semibold text-gray-700 mb-2">Email</label>
           {isEditing ? (
-            <textarea
-              value={editData.bio}
-              onChange={(e) => setEditData({...editData, bio: e.target.value})}
-              rows="4"
+            <input
+              type="email"
+              value={editData.email}
+              onChange={(e) => setEditData({...editData, email: e.target.value})}
               className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
             />
           ) : (
-            <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.bio}</p>
+            <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.email}</p>
           )}
         </div>
 
-        {/* Skills */}
-        <div className="mb-8">
-          <label className="block text-xl font-semibold text-gray-700 mb-3">Skills</label>
-          <div className="flex flex-wrap gap-2">
-            {profileData.skills.map((skill, index) => (
-              <span
-                key={index}
-                className="px-4 py-2 bg-sky-100 text-sky-800  rounded-full font-medium text-lg"
-              >
-                {skill}
-              </span>
-            ))}
-            {isEditing && (
-              <button className="px-4 py-2 border-2 border-dashed border-sky-500 text-sky-700 rounded-full font-medium text-lg hover:bg-sky-50">
-                + Add Skill
-              </button>
-            )}
-          </div>
+        <div>
+          <label className="block text-xl font-semibold text-gray-700 mb-2">Phone Number</label>
+          {isEditing ? (
+            <input
+              type="tel"
+              value={editData.phone}
+              onChange={(e) => setEditData({...editData, phone: e.target.value})}
+              className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+            />
+          ) : (
+            <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.phone}</p>
+          )}
         </div>
 
-        {/* Education */}
         <div>
-          <label className="block text-xl font-semibold text-gray-700 mb-2">Education</label>
+          <label className="block text-xl font-semibold text-gray-700 mb-2">Location</label>
           {isEditing ? (
             <input
               type="text"
-              value={editData.education}
-              onChange={(e) => setEditData({...editData, education: e.target.value})}
+              value={editData.location}
+              onChange={(e) => setEditData({...editData, location: e.target.value})}
               className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
             />
           ) : (
-            <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.education}</p>
+            <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.location}</p>
           )}
         </div>
 
-        {isEditing && (
-          <div className="mt-8 flex justify-end">
-            <button
-              onClick={handleSave}
-              className="px-8 py-3 bg-sky-700 text-white rounded-lg hover:bg-sky-800 transition-colors font-semibold"
+        <div>
+          <label className="block text-xl font-semibold text-gray-700 mb-2">Experience</label>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editData.experience}
+              onChange={(e) => setEditData({...editData, experience: e.target.value})}
+              className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+            />
+          ) : (
+            <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.experience}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Bio */}
+      <div className="mb-8">
+        <label className="block text-xl font-semibold text-gray-700 mb-2">Bio</label>
+        {isEditing ? (
+          <textarea
+            value={editData.bio}
+            onChange={(e) => setEditData({...editData, bio: e.target.value})}
+            rows="4"
+            className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+          />
+        ) : (
+          <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.bio}</p>
+        )}
+      </div>
+
+      {/* Skills */}
+      <div className="mb-8">
+        <label className="block text-xl font-semibold text-gray-700 mb-3">Skills</label>
+        <div className="flex flex-wrap gap-2">
+          {editData.skills.map((skill, index) => (
+            <span
+              key={index}
+              className="px-4 py-2 bg-sky-100 text-sky-800 rounded-full font-medium text-lg flex items-center gap-2"
             >
-              Save Changes
+              {skill}
+              {isEditing && (
+                <button
+                  onClick={() => handleRemoveSkill(index)}
+                  className="ml-2 text-red-600 hover:text-red-800 font-bold"
+                  aria-label="Remove skill"
+                >
+                  ×
+                </button>
+              )}
+            </span>
+          ))}
+          
+          {isEditing && !showSkillInput && (
+            <button 
+              onClick={() => setShowSkillInput(true)}
+              className="px-4 py-2 border-2 border-dashed border-sky-500 text-sky-700 rounded-full font-medium text-lg hover:bg-sky-50"
+            >
+              + Add Skill
             </button>
-          </div>
+          )}
+          
+          {isEditing && showSkillInput && (
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                value={newSkill}
+                onChange={(e) => setNewSkill(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAddSkill();
+                  }
+                }}
+                placeholder="Enter skill"
+                className="px-4 py-2 border border-sky-300 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-500"
+                autoFocus
+              />
+              <button
+                onClick={handleAddSkill}
+                className="px-4 py-2 bg-sky-700 text-white rounded-full hover:bg-sky-800"
+              >
+                Add
+              </button>
+              <button
+                onClick={() => {
+                  setShowSkillInput(false);
+                  setNewSkill('');
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Education */}
+      <div>
+        <label className="block text-xl font-semibold text-gray-700 mb-2">Education</label>
+        {isEditing ? (
+          <input
+            type="text"
+            value={editData.education}
+            onChange={(e) => setEditData({...editData, education: e.target.value})}
+            className="w-full px-4 py-3 border border-sky-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+          />
+        ) : (
+          <p className="text-gray-800 text-lg bg-sky-100 px-4 py-3 rounded-lg">{profileData.education}</p>
         )}
       </div>
     </div>
   );
 };
-
 // Resume Page Component
 const ResumePage = () => {
   const [resumes, setResumes] = useState([]);

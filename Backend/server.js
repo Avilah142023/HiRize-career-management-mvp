@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authroutes.js";
 import uploadRoutes from "./routes/uploadroutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js"; // Add this
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/notes", noteRoutes);
+app.use("/api/profile", profileRoutes);
 
 // Test route
 app.get("/", (req, res) => {

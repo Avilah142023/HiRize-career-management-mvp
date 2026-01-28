@@ -34,7 +34,9 @@ export const signup = async (req, res) => {
       token,
       user: {
         id: user._id,
-        email: user.email,
+        name: user.name,        // From signup form
+        email: user.email,      // From signup form
+        // title will be empty initially, set later in CareerProfile
       },
     });
   } catch (error) {
@@ -69,6 +71,12 @@ export const signin = async (req, res) => {
     res.json({
       message: "Login successful",
       token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        title: user.title,      // This will have value if user completed CareerProfile
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });

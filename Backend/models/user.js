@@ -15,6 +15,52 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // New fields for profile
+    title: {
+      type: String,
+      default: '',
+    },
+    phone: {
+      type: String,
+      default: '',
+    },
+    location: {
+      type: String,
+      default: '',
+    },
+    bio: {
+      type: String,
+      default: '',
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
+    experience: {
+      type: String,
+      default: '',
+    },
+    education: {
+      type: String,
+      default: '',
+    },
+    profileImage: {
+      type: String,
+      default: null,
+    },
+    // Career profile fields
+    role: {
+      type: String,
+      default: '',
+    },
+    industry: {
+      type: String,
+      default: '',
+    },
+    experienceLevel: {
+      type: String,
+      default: '',
+    },
   },
   { timestamps: true }
 );

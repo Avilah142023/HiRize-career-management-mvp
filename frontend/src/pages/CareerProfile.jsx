@@ -6,6 +6,8 @@ const CareerProfile = () => {
     industry: '',
     experienceLevel: ''
   });
+  const [loading, setLoading] = useState(false);  // ADD THIS
+  const [error, setError] = useState(''); // ADD THIS
 
   const industries = [
     'Technology',
@@ -34,10 +36,44 @@ const CareerProfile = () => {
     });
   };
 
-  const handleSubmit = () => {
-    console.log('Profile data:', formData);
-    window.location.href = '/JobPreferences';
-  };
+  const handleSubmit = async () => {
+  setLoading(true);
+  setError('');
+
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      setError('Please login first');
+      window.location.href = '/';
+      return;
+    }
+
+    const response = await fetch('http://localhost:5000/api/profile/career', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(formData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('Career profile updated:', data);
+      // The role is now saved as title in the database
+      window.location.href = '/JobPreferences';
+    } else {
+      setError(data.message || 'Failed to update profile');
+    }
+  } catch (err) {
+    setError('Network error. Please try again.');
+    console.error('Career profile error:', err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-600 to-sky-900 p-6 flex items-center justify-center">
@@ -51,6 +87,13 @@ const CareerProfile = () => {
             We'll customize your dashboard based on your professional profile.
           </p>
         </div>
+
+        {/* ADD THIS ERROR MESSAGE */}
+        {error && (
+         <div className="mx-8 mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+        {error}
+         </div>
+         )}
 
         {/* Form */}
         <div className="space-y-6 px-8 pb-8">
@@ -251,10 +294,11 @@ const CareerProfile = () => {
           {/* Next Button */}
           <button
             onClick={handleSubmit}
-            className="w-full py-4 bg-sky-900 text-white text-lg font-semibold rounded-2xl hover:bg-sky-950 transition-colors mt-8"
-          >
-            Next
-          </button>
+             disabled={loading}  // ADD THIS
+            className="w-full py-4 bg-sky-900 text-white text-lg font-semibold rounded-2xl hover:bg-sky-950 transition-colors mt-8 disabled:bg-sky-300 disabled:cursor-not-allowed"  // ADD disabled styles
+             >
+            {loading ? 'SAVING...' : 'Next'}  {/* CHANGE THIS */}
+            </button>
         </div>
       </div>
     </div>
