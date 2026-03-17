@@ -11,10 +11,30 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    password: {
+     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.authProvider === "email";
+      },
     },
+    authProvider: {
+      type: String,
+      enum: ["email", "google", "linkedin"],
+      default: "email",
+    },
+    googleId: {
+      type: String,
+      default: null,
+    },
+    linkedinId: {
+      type: String,
+      default: null,
+    },
+     systemRole: {
+     type: String,
+     enum: ["candidate", "recruiter", "admin"],
+     default: "candidate",
+     },
     
     title: {
       type: String,
@@ -61,6 +81,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    jobPreferences: {
+  jobTypes: [String],
+  workModes: [String],
+  location: String,
+  availability: String,
+},
   },
   { timestamps: true }
 );

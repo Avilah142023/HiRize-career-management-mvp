@@ -113,16 +113,33 @@ function JobPreferences() {
         {/* SUBMIT */}
         <button
           className="w-full bg-sky-900 text-white py-4 text-lg font-semibold rounded-2xl hover:bg-sky-950 transition-colors mt-8"
-          onClick={() => {
-            const data = {
-              jobTypes,
-              workModes,
-              location,
-              availability,
-            };
-            console.log("Job Preferences:", data);
-            window.location.href = '/Dashboard';
-          }}
+          onClick={async () => {
+  const data = {
+    jobTypes,
+    workModes,
+    location,
+    availability,
+  };
+
+  try {
+    const res = await fetch("http://localhost:5000/api/candidate/preferences", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+    console.log(result);
+
+    window.location.href = "/Dashboard";
+
+  } catch (error) {
+    console.error("Error saving preferences:", error);
+  }
+}}
         >
           Finish Setup
         </button>

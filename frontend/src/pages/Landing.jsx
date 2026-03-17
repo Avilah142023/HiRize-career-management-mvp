@@ -8,7 +8,7 @@ function Landing() {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center cursor-pointer bg-gradient-to-br from-sky-600 to-sky-900 relative overflow-hidden"
-      onClick={() => navigate("/AuthPage")}
+     onClick={() => navigate("/auth")}
     >
       <img
         src={logo}

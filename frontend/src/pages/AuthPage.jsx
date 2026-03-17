@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import logo from '../assets/images/Logo2.png';
 import CareerProfile from './CareerProfile';
 
@@ -24,10 +25,12 @@ const AuthPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    systemRole: 'candidate'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({
@@ -58,10 +61,16 @@ const AuthPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        console.log('Authentication successful:', data);
-        window.location.href = '/CareerProfile';
-      } else {
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user));
+  localStorage.setItem("role", data.user.systemRole);
+
+  if (data.user.systemRole === "recruiter") {
+    navigate("/Recruiter/Dashboard");
+  } else {
+    navigate("/career-profile");
+  }
+} else {
         setError(data.message || 'Authentication failed');
       }
     } catch (err) {
@@ -148,7 +157,22 @@ const AuthPage = () => {
                   className="w-full pl-12 pr-4 py-3 bg-gray-100 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700"
                 />
               </div>
+
             )}
+            {!isSignIn && (
+  <div className="relative">
+    <select
+      name="systemRole"
+      value={formData.systemRole}
+      onChange={handleInputChange}
+      className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700"
+    >
+      <option value="candidate">Candidate</option>
+      <option value="recruiter">Recruiter</option>
+    </select>
+  </div>
+)}
+
 
             <div className="relative">
               <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -189,7 +213,7 @@ const AuthPage = () => {
             )}
 
             <button
-              onClick={() => handleSubmit("/CareerProfile")}
+              onClick={handleSubmit}
               disabled={loading}
               className="w-full py-3 bg-sky-700 text-white rounded-full font-semibold hover:bg-sky-900 transition-colors mt-6 disabled:bg-sky-300 disabled:cursor-not-allowed"
             >

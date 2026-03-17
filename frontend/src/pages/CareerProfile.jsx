@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
 
 const CareerProfile = () => {
@@ -8,6 +9,7 @@ const CareerProfile = () => {
   });
   const [loading, setLoading] = useState(false);  
   const [error, setError] = useState(''); 
+  const navigate = useNavigate();
 
   const industries = [
     'Technology',
@@ -62,8 +64,7 @@ const CareerProfile = () => {
 
     if (response.ok) {
       console.log('Career profile updated:', data);
-      
-      window.location.href = '/JobPreferences';
+      navigate("/job-preferences");
     } else {
       setError(data.message || 'Failed to update profile');
     }
@@ -293,6 +294,7 @@ const CareerProfile = () => {
 
           {/* Next Button */}
           <button
+            type="button"
             onClick={handleSubmit}
              disabled={loading} 
             className="w-full py-4 bg-sky-900 text-white text-lg font-semibold rounded-2xl hover:bg-sky-950 transition-colors mt-8 disabled:bg-sky-300 disabled:cursor-not-allowed"  // ADD disabled styles

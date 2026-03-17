@@ -32,7 +32,7 @@ export const updateCareerProfile = async (req, res) => {
         experienceLevel,
         title: role // Set title as role
       },
-      { new: true }
+     { returnDocument: "after" }
     );
 
     if (!user) {
@@ -104,7 +104,7 @@ export const updateUserProfile = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       userId,
       updateData,
-      { new: true }
+     { returnDocument: "after" }
     ).select('-password');
 
     if (!user) {

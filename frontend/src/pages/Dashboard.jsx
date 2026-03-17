@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from "react-router-dom";
 import logo from "../assets/images/Logo2.png";
+import JobPanel from "../components/jobs/JobPanel";
+import ApplicationPage from "./ApplicationPage";
 
 
 const Dashboard = () => {
@@ -21,11 +24,47 @@ const Dashboard = () => {
    const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const location = useLocation();
+  const [applications, setApplications] = useState([]);
+
+  useEffect(() => {
+  const fetchApplications = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        "http://localhost:5000/api/applications/my-applications",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      setApplications(data);
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+    }
+  };
+
+  fetchApplications();
+}, []);
 
   // Fetch user profile on component mount
   useEffect(() => {
     fetchUserProfile();
   }, []);
+
+  useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const tab = params.get("tab");
+
+  if (tab === "jobs") {
+    setActiveTab("jobs");
+  }
+}, [location]);
+
 
   const fetchUserProfile = async () => {
     try {
@@ -79,6 +118,8 @@ const Dashboard = () => {
     { id: 'coverletter', name: 'Cover Letter', icon: '✉️' },
     { id: 'documents', name: 'Documents', icon: '📁' },
     { id: 'notes', name: 'Notes', icon: '📝' },
+    { id: 'jobs', name: 'Jobs', icon: '💼' },
+    { id: 'applications', name: 'Applications', icon: '📌' },
   ];
 
   const handleLogout = () => {
@@ -98,6 +139,10 @@ const Dashboard = () => {
         return <DocumentsPage />;
       case 'notes':
         return <NotesPage />;
+      case 'jobs':
+        return <JobPanel />;
+      case 'applications':
+        return <ApplicationPage />;
       default:
         return <ProfilePage profileData={profileData} setProfileData={setProfileData} isEditing={isEditing} setIsEditing={setIsEditing} />;
     }
@@ -590,7 +635,7 @@ const ResumePage = () => {
   return (
     <div className="w-full">
       <div className="bg-white rounded-xl shadow-sm p-8">
-        <h3 className="text-4xl font-bold mb-4">Resume</h3>
+        <h3 className="text-4xl text-sky-900 font-bold mb-4">Resume</h3>
 
         {/* Uploaded resumes */}
         {resumes.length === 0 && (
@@ -749,7 +794,7 @@ const CoverLetterPage = () => {
   return (
     <div className="w-full">
       <div className="bg-white rounded-xl shadow-sm p-8">
-        <h3 className="text-4xl font-bold text-gray-900 mb-4">
+        <h3 className="text-4xl font-bold text-sky-900 mb-4">
           Cover Letter
         </h3>
         <p className="text-gray-600 text-xl font-medium mb-6">
@@ -890,7 +935,7 @@ const DocumentsPage = () => {
   return (
     <div className="w-full">
       <div className="bg-white rounded-xl shadow-sm p-8">
-        <h3 className="text-4xl font-bold text-gray-900 mb-4">
+        <h3 className="text-4xl font-bold text-sky-900 mb-4">
           Documents
         </h3>
 
@@ -1052,7 +1097,7 @@ const NotesPage = () => {
       <div className="bg-white rounded-xl shadow-sm p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">Notes</h3>
+            <h3 className="text-4xl font-bold text-sky-900 mb-4">Notes</h3>
             <p className="text-gray-600 font-semibold text-xl">Keep track of important information and ideas</p>
           </div>
           {!isEditing && (
